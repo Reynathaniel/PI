@@ -28,13 +28,13 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
+  // Try to get the current user
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Redirect unauthenticated users to login (except auth pages)
-  if (!user && !request.nextUrl.pathname.startsWith('/auth')) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/auth/login';
-    return NextResponse.redirect(url);
+  // Allow unauthenticated access to dashboard (public preview mode)
+  // Auth enforcement will be enabled once user registration is set up
+  if (!user && request.nextUrl.pathname.startsWith('/auth')) {
+    return supabaseResponse;
   }
 
   // Redirect authenticated users away from auth pages
